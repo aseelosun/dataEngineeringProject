@@ -1,16 +1,46 @@
 package main
 
-type mysqlDb struct {
+import (
+	conf "dataEngineeringProject/config"
+	"database/sql"
+	"fmt"
+	"time"
+)
+
+type MysqlDb struct {
+	iDatabase
 }
 
-func (db *mysqlDb) loadConfiguration() {
+func (m MysqlDb) connectingTodDb(conf conf.MysqlDb) (*sql.DB, error) {
+	mysqlConn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
+		conf.User, conf.Password, conf.Host, conf.Port, conf.Dbname)
 
+	db, err := sql.Open("mysql", mysqlConn)
+	db.SetMaxIdleConns(conf.MaxIdleConns)
+	db.SetMaxOpenConns(conf.MaxOpenConns)
+	db.SetConnMaxLifetime(1800 * time.Second)
+
+	return db, err
 }
 
-func (db *mysqlDb) connectingTodDb() {
+func (m MysqlDb) getListOfAllTables(db *sql.DB) []string {
+	var (
+		tableName string
+		tableType string
+		arrTables []string
+	)
 
-}
-
-func (db *mysqlDb) getListOfAllTables() {
-
+	rows, err := db.Query("show full tables where Table_Type = 'BASE TABLE'")
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		err := rows.Scan(&tableName, &tableType)
+		arrTables = append(arrTables, tableName)
+		if err != nil {
+			panic(err)
+		}
+	}
+	return arrTables
 }
