@@ -1,0 +1,42 @@
+{
+  "mysqlDbs": [
+    {
+      "db": "mysql",
+      "host" : "localhost",
+      "port" : "3306",
+      "user" : "root",
+      "password" : "admin123",
+      "dbname" : "mysql",
+      "MaxIdleConns": "5",
+      "MaxOpenConns": "5",
+      "catalogsPath": "C:\\Users\\Trainee\\GolandProjects\\GoPractice\\catalogs",
+      "tablesPath": "C:\\Users\\Trainee\\GolandProjects\\GoPractice\\catalogs\\tables\\",
+      "viewsPath" : "C:\\Users\\Trainee\\GolandProjects\\GoPractice\\catalogs\\views\\",
+      "procedurePath":"C:\\Users\\Trainee\\GolandProjects\\GoPractice\\catalogs\\procedures\\",
+      "schemaPath": "C:\\\\Users\\\\Trainee\\\\GolandProjects\\\\GoPractice\\\\catalogs\\\\schemas\\"
+    }
+  ],
+  "postgresDbs": [
+    {
+      "host" : "localhost",
+      "port" : "5432",
+      "user" : "postgres",
+      "password" : "admin123",
+      "dbname" : "postgres",
+      "MaxIdleConns": "5",
+      "MaxOpenConns": "5",
+      "catalogsPath": "C:\\Users\\Trainee\\GolandProjects\\GoPractice\\catalogs",
+      "tablesPath": "C:\\Users\\Trainee\\GolandProjects\\GoPractice\\postgres_catalogs\\tables\\"
+    },
+    {
+      "host" : "localhost",
+      "port" : "5432",
+      "user" : "postgres",
+      "password" : "admin123",
+      "dbname" : "postgresssss",
+      "MaxIdleConns": "5",
+      "MaxOpenConns": "5",
+      "tablesPath": "C:\\Users\\Trainee\\GolandProjects\\GoPractice\\postgres_catalogs\\tables\\"
+    }
+  ]
+}
