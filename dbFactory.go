@@ -1,13 +1,17 @@
 package main
 
-func doProcess(dbtype string) (iDatabase, error) {
+import (
+	"fmt"
+)
+
+func GetDbConnect(dbtype string) (IDatabase, error) {
 	switch dbtype {
 	case "postgres":
-		return
+		return &PostgresDb{}, nil
 	case "mysql":
-		return
+		return &MysqlDb{}, nil
 	default:
-		return nil
+		return nil, fmt.Errorf("wrong database type passed")
 	}
 
 }

@@ -7,11 +7,9 @@ import (
 	"os"
 )
 
-type postgresFiles struct {
-	PostgresDb
-}
-type mysqlFiles struct {
-	MysqlDb
+type Ddls struct {
+	ObjectName string
+	ObjectDdl  string
 }
 
 func (p postgresFiles) unloadingTableDDL(conf conf.PostgresDb, db *sql.DB) (file *os.File) {
@@ -32,20 +30,6 @@ func (p postgresFiles) unloadingTableDDL(conf conf.PostgresDb, db *sql.DB) (file
 			tableDdl string
 		)
 
-		rows, err := db.Query(`SELECT generate_create_table_statement($1)`, arrTables[i])
-		if err != nil {
-			panic(err)
-		}
-		for rows.Next() {
-			err := rows.Scan(&tableDdl)
-			if err != nil {
-				panic(err)
-			}
-			_, err2 := file.WriteString("\n" + tableDdl)
-			if err2 != nil {
-				log.Fatal(err2)
-			}
-		}
 	}
 	return file
 
