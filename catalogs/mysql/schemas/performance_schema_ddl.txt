@@ -1,0 +1,2 @@
+
+CREATE DATABASE `performance_schema` /*!40100 DEFAULT CHARACTER SET utf8 */

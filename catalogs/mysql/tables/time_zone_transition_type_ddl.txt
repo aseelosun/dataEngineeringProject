@@ -1,0 +1,9 @@
+
+CREATE TABLE `time_zone_transition_type` (
+  `Time_zone_id` int(10) unsigned NOT NULL,
+  `Transition_type_id` int(10) unsigned NOT NULL,
+  `Offset` int(11) NOT NULL DEFAULT 0,
+  `Is_DST` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `Abbreviation` char(8) NOT NULL DEFAULT '',
+  PRIMARY KEY (`Time_zone_id`,`Transition_type_id`)
+) ENGINE=Aria DEFAULT CHARSET=utf8 PAGE_CHECKSUM=1 TRANSACTIONAL=1 COMMENT='Time zone transition types'

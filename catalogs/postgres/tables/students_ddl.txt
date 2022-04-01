@@ -1,0 +1,6 @@
+
+CREATE TABLE public.students (
+    id integer  NULL,
+    s_name character varying  NULL,
+    s_surname character varying  NULL,
+    s_email character varying  NULL);

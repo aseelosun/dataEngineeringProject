@@ -11,6 +11,9 @@ type ConfigsSql struct {
 	ConfigsSql []SqlDbParams `json:"databases"`
 }
 
+type Paths struct {
+}
+
 type SqlDbParams struct {
 	Db           string
 	Server       string

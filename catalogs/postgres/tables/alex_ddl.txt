@@ -1,0 +1,6 @@
+
+CREATE TABLE public.alex (
+    s_id integer  NOT NULL,
+    s_name character varying(50)  NOT NULL,
+    s_surname character varying(50)  NOT NULL,
+    s_email character varying(50)  NOT NULL);

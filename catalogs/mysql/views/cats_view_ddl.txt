@@ -1,0 +1,2 @@
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `cats_view` AS select `cat`.`c_id` AS `c_id`,`cat`.`c_name` AS `c_name`,`cat`.`c_surname` AS `c_surname` from `cat`
