@@ -1,25 +1,26 @@
 package managingFiles
 
 import (
+	"dataEngineeringProject/types"
 	"io/ioutil"
 	"log"
 	"os"
 )
 
-func UnloadingTableDDl(tableDdls []string, dbname string, tType string) {
+func UnloadingTableDDl(tableDdls []types.DataDDLs, dbname string, tType string) {
 
 	e2 := os.MkdirAll("C:\\Users\\Trainee\\dataEngineeringProject\\catalogs\\"+dbname+"\\"+tType, 0755)
 	tablesPath := "C:\\Users\\Trainee\\dataEngineeringProject\\catalogs\\" + dbname + "\\" + tType + "\\"
 	if e2 != nil {
 		panic(e2)
 	}
-	for i := 0; i < len(tableDdls); i += 2 {
-		file, err := os.Create(tablesPath + tableDdls[i] + "_ddl.txt")
+	for i := 0; i < len(tableDdls); i += 1 {
+		file, err := os.Create(tablesPath + tableDdls[i].ObjectName + "_ddl.txt")
 		if err != nil {
 			log.Fatal(err)
 		}
 		defer file.Close()
-		_, err2 := file.WriteString("\n" + tableDdls[i+1])
+		_, err2 := file.WriteString("\n" + tableDdls[i].ObjectDDL)
 		if err2 != nil {
 			log.Fatal(err2)
 		}

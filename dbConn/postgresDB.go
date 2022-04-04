@@ -2,6 +2,7 @@ package dbConn
 
 import (
 	conf "dataEngineeringProject/config"
+	"dataEngineeringProject/types"
 	"database/sql"
 	"fmt"
 	"log"
@@ -25,18 +26,20 @@ func (p PostgresDb) ConnectingToDb(conf conf.SqlDbParams) (*sql.DB, error) {
 
 	return db, err
 }
-func (p PostgresDb) GetDDLTables(db *sql.DB) []string {
+func (p PostgresDb) GetDDLTables(db *sql.DB) ([]types.DataDDLs, error) {
 	var (
 		tableName   string
-		tablesArray []string
+		tablesArray []types.DataDDLs
 	)
 
 	rows, err := db.Query("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'")
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	defer rows.Close()
+
 	for rows.Next() {
+		var obj types.DataDDLs
 		err := rows.Scan(&tableName)
 		var tableDdl string
 		rows, e4 := db.Query(`SELECT generate_create_table_statement($1)`, tableName)
@@ -49,22 +52,25 @@ func (p PostgresDb) GetDDLTables(db *sql.DB) []string {
 				panic(e5)
 			}
 		}
-		tablesArray = append(tablesArray, tableName, tableDdl)
+		obj.ObjectName = tableName
+		obj.ObjectDDL = tableDdl
+		tablesArray = append(tablesArray, obj)
 		if err != nil {
 			panic(err)
 		}
+		fmt.Println(tablesArray)
 	}
-	return tablesArray
+	return tablesArray, nil
 }
 
-func (p PostgresDb) GetDDLViews(db *sql.DB) []string {
+func (p PostgresDb) GetDDLViews(db *sql.DB) ([]types.DataDDLs, error) {
 	return nil
 }
 
-func (p PostgresDb) GetDDLProcedures(db *sql.DB) []string {
+func (p PostgresDb) GetDDLProcedures(db *sql.DB) ([]types.DataDDLs, error) {
 	return nil
 }
 
-func (p PostgresDb) GetDDLSchemas(db *sql.DB) []string {
+func (p PostgresDb) GetDDLSchemas(db *sql.DB) ([]types.DataDDLs, error) {
 	return nil
 }

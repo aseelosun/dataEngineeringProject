@@ -12,6 +12,7 @@ type ConfigsSql struct {
 }
 
 type Paths struct {
+	CatalogsPath string
 }
 
 type SqlDbParams struct {

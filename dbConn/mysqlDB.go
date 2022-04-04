@@ -2,6 +2,7 @@ package dbConn
 
 import (
 	conf "dataEngineeringProject/config"
+	"dataEngineeringProject/types"
 	"database/sql"
 	"fmt"
 	"time"
@@ -23,19 +24,20 @@ func (m MysqlDb) ConnectingToDb(conf conf.SqlDbParams) (*sql.DB, error) {
 	return db, err
 }
 
-func (m MysqlDb) GetDDLTables(db *sql.DB) []string {
+func (m MysqlDb) GetDDLTables(db *sql.DB) ([]types.DataDDLs, error) {
 	var (
 		tableName   string
 		tableType   string
-		tablesArray []string
+		tablesArray []types.DataDDLs
 	)
 
 	rows, err := db.Query("show full tables where Table_Type = 'BASE TABLE'")
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	defer rows.Close()
 	for rows.Next() {
+		var obj types.DataDDLs
 		err := rows.Scan(&tableName, &tableType)
 		if err != nil {
 			panic(err)
@@ -57,25 +59,28 @@ func (m MysqlDb) GetDDLTables(db *sql.DB) []string {
 			if err != nil {
 				panic(err)
 			}
-			tablesArray = append(tablesArray, tableNamee, tableDdl)
+			obj.ObjectName = tableName
+			obj.ObjectDDL = tableDdl
+			tablesArray = append(tablesArray, obj)
 		}
 	}
-	return tablesArray
+	return tablesArray, nil
 }
 
-func (m MysqlDb) GetDDLViews(db *sql.DB) []string {
+func (m MysqlDb) GetDDLViews(db *sql.DB) ([]types.DataDDLs, error) {
 	var (
 		tableName string
 		tableType string
-		arrTables []string
+		arrTables []types.DataDDLs
 	)
 
 	rows, err := db.Query("SHOW FULL TABLES IN mysql WHERE table_type LIKE 'VIEW'")
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	defer rows.Close()
 	for rows.Next() {
+		var obj types.DataDDLs
 		err := rows.Scan(&tableName, &tableType)
 		if err != nil {
 			panic(err)
@@ -96,13 +101,15 @@ func (m MysqlDb) GetDDLViews(db *sql.DB) []string {
 			if err != nil {
 				panic(err)
 			}
-			arrTables = append(arrTables, tableName, viewDdl)
+			obj.ObjectName = tableName
+			obj.ObjectDDL = viewDdl
+			arrTables = append(arrTables, obj)
 		}
 	}
-	return arrTables
+	return arrTables, nil
 }
 
-func (m MysqlDb) GetDDLProcedures(db *sql.DB) []string {
+func (m MysqlDb) GetDDLProcedures(db *sql.DB) ([]types.DataDDLs, error) {
 	var (
 		dbb           string
 		name          string
@@ -115,15 +122,16 @@ func (m MysqlDb) GetDDLProcedures(db *sql.DB) []string {
 		ch_set        string
 		coll_conn     string
 		db_coll       string
-		arrProcedures []string
+		arrProcedures []types.DataDDLs
 	)
 
 	rows, err := db.Query("SHOW PROCEDURE STATUS")
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	defer rows.Close()
 	for rows.Next() {
+		var obj types.DataDDLs
 		err := rows.Scan(&dbb, &name, &ttype, &definer, &modified, &created, &sec_type, &comment, &ch_set, &coll_conn, &db_coll)
 		if err != nil {
 			panic(err)
@@ -147,24 +155,27 @@ func (m MysqlDb) GetDDLProcedures(db *sql.DB) []string {
 			if err != nil {
 				panic(err)
 			}
-			arrProcedures = append(arrProcedures, name, createProcedure)
+			obj.ObjectName = name
+			obj.ObjectDDL = createProcedure
+			arrProcedures = append(arrProcedures, obj)
 		}
 
 	}
-	return arrProcedures
+	return arrProcedures, nil
 }
 
-func (m MysqlDb) GetDDLSchemas(db *sql.DB) []string {
+func (m MysqlDb) GetDDLSchemas(db *sql.DB) ([]types.DataDDLs, error) {
 	var (
 		dbName     string
-		arrSchemas []string
+		arrSchemas []types.DataDDLs
 	)
 
 	rows, err := db.Query("show databases")
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	for rows.Next() {
+		var obj types.DataDDLs
 		err := rows.Scan(&dbName)
 
 		if err != nil {
@@ -185,8 +196,10 @@ func (m MysqlDb) GetDDLSchemas(db *sql.DB) []string {
 			if err != nil {
 				panic(err)
 			}
-			arrSchemas = append(arrSchemas, dbName, createDatabase)
+			obj.ObjectName = dbName
+			obj.ObjectDDL = createDatabase
+			arrSchemas = append(arrSchemas, obj)
 		}
 	}
-	return arrSchemas
+	return arrSchemas, nil
 }

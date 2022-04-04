@@ -10,44 +10,70 @@ import (
 	_ "github.com/lib/pq"
 )
 
+const (
+	strArray = []string{"tables", "views", "procedures", "schemas"}
+)
+
 func main() {
+
 	conf, e := cfg.LoadConfiguration("C:\\configFile\\config.json")
 	checkError(e)
 
 	for i := 0; i < len(conf.ConfigsSql); i++ {
 		db, err := dbConn.GetDbConnect(conf.ConfigsSql[i].Db)
-		checkError(err)
+
+		if nil != err {
+			checkError(err)
+			continue
+		}
 		dbb, errr := db.ConnectingToDb(conf.ConfigsSql[i])
 		checkError(errr)
-		strArray := []string{"tables", "views", "procedures", "schemas"}
 
-		for j := 0; j < len(strArray); j++ {
-			switch strArray[j] {
-			case "tables":
-				arr1 := db.GetDDLTables(dbb)
-				managingFiles.UnloadingTableDDl(arr1, conf.ConfigsSql[i].Dbname, strArray[j])
-				remTable := managingFiles.RemoveTableFromLocal(conf.ConfigsSql[i].Dbname, strArray[j], arr1)
-				git.CommitAndPush(remTable, conf.ConfigsSql[i].Dbname)
-			case "views":
-				arr2 := db.GetDDLViews(dbb)
-				managingFiles.UnloadingTableDDl(arr2, conf.ConfigsSql[i].Dbname, strArray[j])
-				remTable := managingFiles.RemoveTableFromLocal(conf.ConfigsSql[i].Dbname, strArray[j], arr2)
-				git.CommitAndPush(remTable, conf.ConfigsSql[i].Dbname)
-			case "procedures":
-				arr3 := db.GetDDLProcedures(dbb)
-				managingFiles.UnloadingTableDDl(arr3, conf.ConfigsSql[i].Dbname, strArray[j])
-				remTable := managingFiles.RemoveTableFromLocal(conf.ConfigsSql[i].Dbname, strArray[j], arr3)
-				git.CommitAndPush(remTable, conf.ConfigsSql[i].Dbname)
-			case "schemas":
-				arr4 := db.GetDDLSchemas(dbb)
-				managingFiles.UnloadingTableDDl(arr4, conf.ConfigsSql[i].Dbname, strArray[j])
-				remTable := managingFiles.RemoveTableFromLocal(conf.ConfigsSql[i].Dbname, strArray[j], arr4)
-				git.CommitAndPush(remTable, conf.ConfigsSql[i].Dbname)
-			default:
-				fmt.Println("Something went wrong...")
-			}
+		for strArray...)
+		worker := new
+		worker(strArray[i])
+		if nil != err {
+			checkError(err)
+			continue
 		}
+		worker.GetDDLTables(dbb)
+		worker.UnloadingTableDDl
+		worker.CommitAndPush
+
+		arr1, err := db.GetDDLTables(dbb)
+		if nil != err {
+			checkError(err)
+			continue
+		}
+		err = managingFiles.UnloadingTableDDl(arr1, conf.ConfigsSql[i].Dbname, strArray[j])
+		if nil != err {
+			checkError(err)
+			continue
+		}
+		remTable := managingFiles.RemoveTableFromLocal(conf.ConfigsSql[i].Dbname, strArray[j], arr1)
+		if nil != err {
+			checkError(err)
+			continue
+		}
+		git.CommitAndPush(remTable, conf.ConfigsSql[i].Dbname)
+
+		arr2 := db.GetDDLViews(dbb)
+		managingFiles.UnloadingTableDDl(arr2, conf.ConfigsSql[i].Dbname, strArray[j])
+		remTable := managingFiles.RemoveTableFromLocal(conf.ConfigsSql[i].Dbname, strArray[j], arr2)
+		git.CommitAndPush(remTable, conf.ConfigsSql[i].Dbname)
+
+		arr3 := db.GetDDLProcedures(dbb)
+		managingFiles.UnloadingTableDDl(arr3, conf.ConfigsSql[i].Dbname, strArray[j])
+		remTable := managingFiles.RemoveTableFromLocal(conf.ConfigsSql[i].Dbname, strArray[j], arr3)
+		git.CommitAndPush(remTable, conf.ConfigsSql[i].Dbname)
+
+		arr4 := db.GetDDLSchemas(dbb)
+		managingFiles.UnloadingTableDDl(arr4, conf.ConfigsSql[i].Dbname, strArray[j])
+		remTable := managingFiles.RemoveTableFromLocal(conf.ConfigsSql[i].Dbname, strArray[j], arr4)
+		git.CommitAndPush(remTable, conf.ConfigsSql[i].Dbname)
+
 	}
+}
 
 }
 
