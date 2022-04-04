@@ -1,18 +1,17 @@
 package managingFiles
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
 )
 
-func UnloadingTableDDl(tableDdls []string) {
+func UnloadingTableDDl(tableDdls []string, dbname string, tType string) {
 
-	e2 := os.MkdirAll("C:\\Users\\Trainee\\dataEngineeringProject\\catalogs\\postgres\\tables", 0755)
-	tablesPath := "C:\\Users\\Trainee\\dataEngineeringProject\\catalogs\\postgres\\tables\\"
+	e2 := os.MkdirAll("C:\\Users\\Trainee\\dataEngineeringProject\\catalogs\\"+dbname+"\\"+tType, 0755)
+	tablesPath := "C:\\Users\\Trainee\\dataEngineeringProject\\catalogs\\" + dbname + "\\" + tType + "\\"
 	if e2 != nil {
-		fmt.Println(e2)
+		panic(e2)
 	}
 	for i := 0; i < len(tableDdls); i += 2 {
 		file, err := os.Create(tablesPath + tableDdls[i] + "_ddl.txt")
@@ -37,16 +36,16 @@ func tableInDb(tableName string, tablesList []string) bool {
 	return false
 }
 
-func RemoveTableFromLocal(folderName string, arr []string) string {
-	items, _ := ioutil.ReadDir("C:\\Users\\Trainee\\dataEngineeringProject\\catalogs\\mysql\\" + folderName)
+func RemoveTableFromLocal(dbname string, folderName string, arr []string) string {
+	items, _ := ioutil.ReadDir("C:\\Users\\Trainee\\dataEngineeringProject\\catalogs\\" + dbname + "\\" + folderName)
 	var removedFileName string
 	for _, item := range items {
 		if !tableInDb(item.Name(), arr) {
 			removedFileName = item.Name()
-			path := "C:\\Users\\Trainee\\dataEngineeringProject\\catalogs\\mysql\\" + folderName + "\\" + item.Name()
+			path := "C:\\Users\\Trainee\\dataEngineeringProject\\catalogs\\" + dbname + "\\" + folderName + "\\" + item.Name()
 			errr := os.Remove(path)
 			if errr != nil {
-				fmt.Println(errr)
+				panic(errr)
 			}
 		}
 	}

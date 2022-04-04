@@ -13,7 +13,7 @@ import (
 var storer *memory.Storage
 var fs billy.Filesystem
 
-func CommitAndPush(removedFile string) {
+func CommitAndPush(removedFile string, dbname string) {
 	storer = memory.NewStorage()
 	fs = memfs.New()
 	auth := &http.BasicAuth{
@@ -27,31 +27,27 @@ func CommitAndPush(removedFile string) {
 		Auth: auth,
 	})
 	if err != nil {
-		fmt.Printf("%v", err)
 		return
 	}
 
 	w, err := r.Worktree()
 	if err != nil {
-		fmt.Printf("%v", err)
 		return
 	}
-	items, _ := ioutil.ReadDir("C:\\Users\\Trainee\\dataEngineeringProject\\catalogs\\mysql")
+	items, _ := ioutil.ReadDir("C:\\Users\\Trainee\\dataEngineeringProject\\catalogs\\" + dbname)
 	for _, item := range items {
 		if len(removedFile) > 0 {
-			remFile := "catalogs/mysql/" + item.Name() + "/" + removedFile
+			remFile := "catalogs/" + dbname + "/" + item.Name() + "/" + removedFile
 			w.Remove(remFile)
 		}
-		fmt.Println(items)
-		fmt.Println(item)
 		if item.IsDir() {
-			subitems, _ := ioutil.ReadDir("C:\\Users\\Trainee\\dataEngineeringProject\\catalogs\\mysql\\" + item.Name())
+			subitems, _ := ioutil.ReadDir("C:\\Users\\Trainee\\dataEngineeringProject\\catalogs\\" + dbname + "\\" + item.Name())
 			for _, subitem := range subitems {
 				if !subitem.IsDir() {
 
-					txtfiles, _ := ioutil.ReadFile("C:\\Users\\Trainee\\dataEngineeringProject\\catalogs\\mysql\\" + item.Name() + "\\" + subitem.Name())
+					txtfiles, _ := ioutil.ReadFile("C:\\Users\\Trainee\\dataEngineeringProject\\catalogs\\" + dbname + "\\" + item.Name() + "\\" + subitem.Name())
 
-					filePath := "catalogs/mysql/" + item.Name() + "/" + subitem.Name()
+					filePath := "catalogs/" + dbname + "/" + item.Name() + "/" + subitem.Name()
 
 					newFile, err := fs.Create(filePath)
 					if err != nil {
@@ -68,8 +64,6 @@ func CommitAndPush(removedFile string) {
 			fmt.Println(item.Name())
 		}
 	}
-
-	fmt.Println(w.Status())
 
 	w.Commit("Files updated", &git.CommitOptions{})
 

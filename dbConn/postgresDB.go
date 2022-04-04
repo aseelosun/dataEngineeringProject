@@ -21,7 +21,7 @@ func (p PostgresDb) ConnectingToDb(conf conf.SqlDbParams) (*sql.DB, error) {
 	db.SetMaxIdleConns(conf.MaxIdleConns)
 	db.SetMaxOpenConns(conf.MaxOpenConns)
 	db.SetConnMaxLifetime(1800 * time.Second)
-	fmt.Printf("Connected!\n")
+	fmt.Printf("Postgres Connected!\n")
 
 	return db, err
 }
@@ -41,12 +41,12 @@ func (p PostgresDb) GetDDLTables(db *sql.DB) []string {
 		var tableDdl string
 		rows, e4 := db.Query(`SELECT generate_create_table_statement($1)`, tableName)
 		if e4 != nil {
-			fmt.Println(e4)
+			panic(e4)
 		}
 		for rows.Next() {
 			e5 := rows.Scan(&tableDdl)
 			if e5 != nil {
-				fmt.Println(e5)
+				panic(e5)
 			}
 		}
 		tablesArray = append(tablesArray, tableName, tableDdl)
@@ -57,14 +57,14 @@ func (p PostgresDb) GetDDLTables(db *sql.DB) []string {
 	return tablesArray
 }
 
-//func (p PostgresDb) GetDDLViews(db *sql.DB) []string {
-//	return nil
-//}
-//
-//func (p PostgresDb) GetDDLProcedures(db *sql.DB) []string {
-//	return nil
-//}
-//
-//func (p PostgresDb) GetDDLSchemas(db *sql.DB) []string {
-//	return nil
-//}
+func (p PostgresDb) GetDDLViews(db *sql.DB) []string {
+	return nil
+}
+
+func (p PostgresDb) GetDDLProcedures(db *sql.DB) []string {
+	return nil
+}
+
+func (p PostgresDb) GetDDLSchemas(db *sql.DB) []string {
+	return nil
+}

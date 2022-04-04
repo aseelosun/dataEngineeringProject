@@ -1,0 +1,7 @@
+
+CREATE TABLE `alex` (
+  `s_id` int(11) NOT NULL,
+  `s_name` varchar(50) NOT NULL,
+  `s_surname` varchar(50) NOT NULL,
+  `s_email` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
