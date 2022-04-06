@@ -1,2 +1,0 @@
-
-CREATE DATABASE `information_schema` /*!40100 DEFAULT CHARACTER SET utf8 */

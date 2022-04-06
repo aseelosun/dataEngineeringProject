@@ -7,12 +7,12 @@ import (
 	"os"
 )
 
-func UnloadingTableDDl(tableDdls []types.DataDDLs, dbname string, tType string) {
+func UnloadingTableDDl(tableDdls []types.DataDDLs, dbname string, tType string) error {
 
 	e2 := os.MkdirAll("C:\\Users\\Trainee\\dataEngineeringProject\\catalogs\\"+dbname+"\\"+tType, 0755)
 	tablesPath := "C:\\Users\\Trainee\\dataEngineeringProject\\catalogs\\" + dbname + "\\" + tType + "\\"
 	if e2 != nil {
-		panic(e2)
+		return e2
 	}
 	for i := 0; i < len(tableDdls); i += 1 {
 		file, err := os.Create(tablesPath + tableDdls[i].ObjectName + "_ddl.txt")
@@ -26,29 +26,30 @@ func UnloadingTableDDl(tableDdls []types.DataDDLs, dbname string, tType string) 
 		}
 
 	}
+	return nil
 }
 
-func tableInDb(tableName string, tablesList []string) bool {
-	for i := 0; i < len(tablesList); i += 2 {
-		if (tablesList[i] + "_ddl.txt") == tableName {
+func tableInDb(tableName string, obj []types.DataDDLs) bool {
+	for i := 0; i < len(obj); i += 2 {
+		if (obj[i].ObjectName + "_ddl.txt") == tableName {
 			return true
 		}
 	}
 	return false
 }
 
-func RemoveTableFromLocal(dbname string, folderName string, arr []string) string {
+func RemoveTableFromLocal(dbname string, folderName string, obj []types.DataDDLs) (string, error) {
 	items, _ := ioutil.ReadDir("C:\\Users\\Trainee\\dataEngineeringProject\\catalogs\\" + dbname + "\\" + folderName)
 	var removedFileName string
 	for _, item := range items {
-		if !tableInDb(item.Name(), arr) {
+		if !tableInDb(item.Name(), obj) {
 			removedFileName = item.Name()
 			path := "C:\\Users\\Trainee\\dataEngineeringProject\\catalogs\\" + dbname + "\\" + folderName + "\\" + item.Name()
 			errr := os.Remove(path)
 			if errr != nil {
-				panic(errr)
+				return "", errr
 			}
 		}
 	}
-	return removedFileName
+	return removedFileName, nil
 }

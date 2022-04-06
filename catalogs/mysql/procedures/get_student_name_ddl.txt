@@ -1,5 +1,0 @@
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `get_student_name`(IN id int, OUT name varchar(50))
-BEGIN
-    SELECT s_name INTO name FROM students WHERE id = s_id;
-END

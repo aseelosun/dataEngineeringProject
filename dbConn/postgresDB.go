@@ -64,13 +64,16 @@ func (p PostgresDb) GetDDLTables(db *sql.DB) ([]types.DataDDLs, error) {
 }
 
 func (p PostgresDb) GetDDLViews(db *sql.DB) ([]types.DataDDLs, error) {
-	return nil
+	var arrDdl []types.DataDDLs
+	return arrDdl, nil
 }
 
 func (p PostgresDb) GetDDLProcedures(db *sql.DB) ([]types.DataDDLs, error) {
-	return nil
+	var arrDdl []types.DataDDLs
+	return arrDdl, nil
 }
 
 func (p PostgresDb) GetDDLSchemas(db *sql.DB) ([]types.DataDDLs, error) {
-	return nil
+	var arrDdl []types.DataDDLs
+	return arrDdl, nil
 }

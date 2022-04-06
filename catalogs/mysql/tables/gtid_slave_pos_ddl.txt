@@ -1,8 +1,0 @@
-
-CREATE TABLE `gtid_slave_pos` (
-  `domain_id` int(10) unsigned NOT NULL,
-  `sub_id` bigint(20) unsigned NOT NULL,
-  `server_id` int(10) unsigned NOT NULL,
-  `seq_no` bigint(20) unsigned NOT NULL,
-  PRIMARY KEY (`domain_id`,`sub_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Replication slave GTID position'

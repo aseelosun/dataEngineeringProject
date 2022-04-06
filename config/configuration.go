@@ -11,10 +11,6 @@ type ConfigsSql struct {
 	ConfigsSql []SqlDbParams `json:"databases"`
 }
 
-type Paths struct {
-	CatalogsPath string
-}
-
 type SqlDbParams struct {
 	Db           string
 	Server       string
@@ -38,4 +34,22 @@ func LoadConfiguration(filename string) (ConfigsSql, error) {
 	var configs ConfigsSql
 	json.Unmarshal(byteValue, &configs)
 	return configs, err
+}
+
+type Paths struct {
+	CatalogsPath string `json:"catalogsPath"`
+}
+
+func LoadPaths(filename string) (Paths, error) {
+	jsonFile, err := os.Open(filename)
+	if err != nil {
+		fmt.Println(err)
+	}
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+	//fmt.Println(string(byteValue))
+	var config Paths
+	json.Unmarshal(byteValue, &config)
+	fmt.Println(config)
+	return config, err
+
 }

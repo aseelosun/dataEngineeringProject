@@ -13,7 +13,7 @@ import (
 var storer *memory.Storage
 var fs billy.Filesystem
 
-func CommitAndPush(removedFile string, dbname string) {
+func CommitAndPush(removedFile string, dbname string) error {
 	storer = memory.NewStorage()
 	fs = memfs.New()
 	auth := &http.BasicAuth{
@@ -27,12 +27,12 @@ func CommitAndPush(removedFile string, dbname string) {
 		Auth: auth,
 	})
 	if err != nil {
-		return
+		return err
 	}
 
 	w, err := r.Worktree()
 	if err != nil {
-		return
+		return err
 	}
 	items, _ := ioutil.ReadDir("C:\\Users\\Trainee\\dataEngineeringProject\\catalogs\\" + dbname)
 	for _, item := range items {
@@ -51,7 +51,7 @@ func CommitAndPush(removedFile string, dbname string) {
 
 					newFile, err := fs.Create(filePath)
 					if err != nil {
-						return
+						return err
 					}
 					newFile.Write(txtfiles)
 					newFile.Close()
@@ -72,7 +72,7 @@ func CommitAndPush(removedFile string, dbname string) {
 		Auth:       auth,
 	})
 	if err != nil {
-		return
+		return err
 	}
-	return
+	return nil
 }

@@ -13,5 +13,4 @@ func GetDbConnect(dbtype string) (IDatabase, error) {
 	default:
 		return nil, fmt.Errorf("wrong database type passed")
 	}
-
 }

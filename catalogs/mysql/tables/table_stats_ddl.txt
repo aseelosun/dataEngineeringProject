@@ -1,7 +1,0 @@
-
-CREATE TABLE `table_stats` (
-  `db_name` varchar(64) COLLATE utf8_bin NOT NULL,
-  `table_name` varchar(64) COLLATE utf8_bin NOT NULL,
-  `cardinality` bigint(21) unsigned DEFAULT NULL,
-  PRIMARY KEY (`db_name`,`table_name`)
-) ENGINE=Aria DEFAULT CHARSET=utf8 COLLATE=utf8_bin PAGE_CHECKSUM=1 TRANSACTIONAL=0 COMMENT='Statistics on Tables'
