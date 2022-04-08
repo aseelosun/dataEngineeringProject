@@ -1,0 +1,6 @@
+
+CREATE TABLE `time_zone_leap_second` (
+  `Transition_time` bigint(20) NOT NULL,
+  `Correction` int(11) NOT NULL,
+  PRIMARY KEY (`Transition_time`)
+) ENGINE=Aria DEFAULT CHARSET=utf8 PAGE_CHECKSUM=1 TRANSACTIONAL=1 COMMENT='Leap seconds information for time zones'

@@ -12,13 +12,18 @@ import (
 	_ "github.com/lib/pq"
 )
 
+const ConfigPath = "C:\\configFile\\config.json"
+
 type ParameterValues struct {
-	d           dbConn.IDatabase
-	dbConn      *sql.DB
-	dbname      string
-	tType       string
-	tableDdls   []types.DataDDLs
-	removedFile string
+	d             dbConn.IDatabase
+	dbConn        *sql.DB
+	cPath         string
+	dbname        string
+	tType         string
+	gitUsername   string
+	gitPassword   string
+	gitRepo       string
+	gitRemoteName string
 }
 
 type Chain interface {
@@ -36,7 +41,7 @@ func (d *ddlGet) Action(p *ParameterValues) ([]types.DataDDLs, string, error) {
 			fmt.Sprintf("Error %s", e)
 			return arr, "", e
 		}
-		fmt.Println("get table ddl done")
+		fmt.Println("getting tables ddl is done")
 		return arr, "", nil
 
 	case "views":
@@ -45,7 +50,7 @@ func (d *ddlGet) Action(p *ParameterValues) ([]types.DataDDLs, string, error) {
 			fmt.Sprintf("Error %s", e)
 			return arr, "", e
 		}
-		fmt.Println("get views ddl done")
+		fmt.Println("getting views ddl is done")
 		return arr, "", nil
 
 	case "procedures":
@@ -54,7 +59,7 @@ func (d *ddlGet) Action(p *ParameterValues) ([]types.DataDDLs, string, error) {
 			fmt.Sprintf("Error %s", e)
 			return arr, "", e
 		}
-		fmt.Println("get procedures ddl done")
+		fmt.Println("getting procedures is done")
 		return arr, "", nil
 
 	case "schemas":
@@ -63,7 +68,7 @@ func (d *ddlGet) Action(p *ParameterValues) ([]types.DataDDLs, string, error) {
 			fmt.Sprintf("Error %s", e)
 			return arr, "", e
 		}
-		fmt.Println("get schemas ddl done")
+		fmt.Println("getting schemas ddl is done")
 		return arr, "", nil
 	default:
 		fmt.Println("Cannot get ddl")
@@ -74,53 +79,60 @@ func (d *ddlGet) Action(p *ParameterValues) ([]types.DataDDLs, string, error) {
 }
 
 type ddlUpload struct {
-	caller Chain
+	tableDdls []types.DataDDLs
+	caller    Chain
 }
 
 func (d *ddlUpload) Action(p *ParameterValues) ([]types.DataDDLs, string, error) {
 	var arr []types.DataDDLs
-	err := managingFiles.UnloadingTableDDl(p.tableDdls, p.dbname, p.tType)
+	err := managingFiles.UnloadingTableDDl(d.tableDdls, p.cPath, p.dbname, p.tType)
 	if err != nil {
 		fmt.Sprintf("Error %s", err)
 		return arr, "", err
 	}
-	fmt.Println("unloading ddl done")
+	fmt.Println("unloading ddl is done")
 	return arr, "", nil
 }
 
 type ddlRemove struct {
-	caller Chain
+	tableDdls []types.DataDDLs
+	caller    Chain
 }
 
 func (d *ddlRemove) Action(p *ParameterValues) ([]types.DataDDLs, string, error) {
-	removedFile, err := managingFiles.RemoveTableFromLocal(p.dbname, p.tType, p.tableDdls)
+	removedFile, err := managingFiles.RemoveTableFromLocal(p.cPath, p.dbname, p.tType, d.tableDdls)
 	var arr []types.DataDDLs
 	if err != nil {
 		fmt.Sprintf("Error %s", err)
 		return arr, "", err
 	}
-	fmt.Println("removing ddl done")
+	fmt.Println("removing ddl is done")
 	return arr, removedFile, nil
 }
 
 type ddlCommit struct {
-	caller Chain
+	removedFile string
+	caller      Chain
 }
 
 func (d *ddlCommit) Action(p *ParameterValues) ([]types.DataDDLs, string, error) {
-	err := git.CommitAndPush(p.removedFile, p.dbname)
+	err := git.CommitAndPush(p.gitRemoteName, p.gitUsername, p.gitPassword, p.gitRepo, p.cPath, d.removedFile, p.dbname)
 	var arr []types.DataDDLs
 	if err != nil {
 		fmt.Sprintf("Error %s", err)
 		return arr, "", err
 	}
-	fmt.Println("removing ddl done")
+	fmt.Println("committing ddl is done")
 	return arr, "", nil
 }
 
 func ExecuteChain() error {
-	conf, e := cfg.LoadConfiguration("C:\\configFile\\config.json")
+	conf, e := cfg.LoadConfiguration(ConfigPath)
 	checkError(e)
+	paths, ee := cfg.LoadPaths(ConfigPath)
+	checkError(ee)
+	gitConf, eee := cfg.LoadGitConfigs(ConfigPath)
+	checkError(eee)
 
 	for i := 0; i < len(conf.ConfigsSql); i++ {
 		d, err := dbConn.GetDbConnect(conf.ConfigsSql[i].Db)
@@ -130,29 +142,39 @@ func ExecuteChain() error {
 		strArray := []string{"tables", "views", "procedures", "schemas"}
 		for j := 0; j < len(strArray); j++ {
 			prm := ParameterValues{
-				d:      d,
-				dbConn: db,
-				dbname: conf.ConfigsSql[i].Dbname,
-				tType:  strArray[j],
+				d:           d,
+				dbConn:      db,
+				cPath:       paths.Paths.CatalogsPath,
+				dbname:      conf.ConfigsSql[i].Dbname,
+				tType:       strArray[j],
+				gitUsername: gitConf.Github.Username,
+				gitPassword: gitConf.Github.Password,
+				gitRepo:     gitConf.Github.Repository,
 			}
 
 			chain0 := &ddlGet{}
 
+			arr, _, e1 := chain0.Action(&prm)
+			checkError(e1)
+
 			chain1 := &ddlUpload{
-				caller: chain0,
+				tableDdls: arr,
+				caller:    chain0,
 			}
+			_, _, e2 := chain1.Action(&prm)
+			checkError(e2)
+
 			chain2 := &ddlRemove{
-				caller: chain1,
+				tableDdls: arr,
+				caller:    chain1,
 			}
+			_, remFile, e3 := chain2.Action(&prm)
+			checkError(e3)
 
-			finalChain := &ddlCommit{caller: chain2}
+			finalChain := &ddlCommit{removedFile: remFile, caller: chain2}
 
-			_, _, err := finalChain.Action(&prm)
-
-			if err != nil {
-				fmt.Sprintf("Error %s", err)
-				return err
-			}
+			_, _, e4 := finalChain.Action(&prm)
+			checkError(e4)
 
 			fmt.Println("Success!")
 
