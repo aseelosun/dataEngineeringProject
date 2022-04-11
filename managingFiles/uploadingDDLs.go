@@ -3,7 +3,6 @@ package managingFiles
 import (
 	"dataEngineeringProject/types"
 	"io/ioutil"
-	"log"
 	"os"
 )
 
@@ -16,12 +15,11 @@ func UnloadingTableDDl(tableDdls []types.DataDDLs, cPath string, dbname string, 
 	for i := 0; i < len(tableDdls); i += 1 {
 		file, err := os.Create(tablesPath + tableDdls[i].ObjectName + "_ddl.txt")
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
-		defer file.Close()
 		_, err2 := file.WriteString("\n" + tableDdls[i].ObjectDDL)
 		if err2 != nil {
-			log.Fatal(err2)
+			return err2
 		}
 
 	}

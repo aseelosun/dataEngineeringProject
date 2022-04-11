@@ -35,12 +35,12 @@ func (m MysqlDb) GetDDLTables(db *sql.DB) ([]types.DataDDLs, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+
 	for rows.Next() {
 		var obj types.DataDDLs
 		err := rows.Scan(&tableName, &tableType)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 		var (
 			tableNamee string
@@ -49,15 +49,15 @@ func (m MysqlDb) GetDDLTables(db *sql.DB) ([]types.DataDDLs, error) {
 
 		rows, err := db.Query("SHOW CREATE TABLE " + tableName)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 		for rows.Next() {
 			err := rows.Scan(&tableNamee, &tableDdl)
 			if err != nil {
-				panic(err)
+				return nil, err
 			}
 			obj.ObjectName = tableName
 			obj.ObjectDDL = tableDdl
@@ -78,12 +78,12 @@ func (m MysqlDb) GetDDLViews(db *sql.DB) ([]types.DataDDLs, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+
 	for rows.Next() {
 		var obj types.DataDDLs
 		err := rows.Scan(&tableName, &tableType)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 		var (
 			viewName             string
@@ -94,12 +94,12 @@ func (m MysqlDb) GetDDLViews(db *sql.DB) ([]types.DataDDLs, error) {
 
 		rows, err := db.Query("SHOW CREATE VIEW " + tableName)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 		for rows.Next() {
 			err := rows.Scan(&viewName, &viewDdl, &character_set_client, &collation_connection)
 			if err != nil {
-				panic(err)
+				return nil, err
 			}
 			obj.ObjectName = tableName
 			obj.ObjectDDL = viewDdl
@@ -134,7 +134,7 @@ func (m MysqlDb) GetDDLProcedures(db *sql.DB) ([]types.DataDDLs, error) {
 		var obj types.DataDDLs
 		err := rows.Scan(&dbb, &name, &ttype, &definer, &modified, &created, &sec_type, &comment, &ch_set, &coll_conn, &db_coll)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 		var (
 			procedure           string
@@ -147,13 +147,13 @@ func (m MysqlDb) GetDDLProcedures(db *sql.DB) ([]types.DataDDLs, error) {
 
 		rows, err := db.Query("SHOW CREATE PROCEDURE " + name)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 		defer rows.Close()
 		for rows.Next() {
 			err := rows.Scan(&procedure, &sqlMode, &createProcedure, &characterSetClient, &collationConnection, &databaseCollation)
 			if err != nil {
-				panic(err)
+				return nil, err
 			}
 			obj.ObjectName = name
 			obj.ObjectDDL = createProcedure
@@ -179,7 +179,7 @@ func (m MysqlDb) GetDDLSchemas(db *sql.DB) ([]types.DataDDLs, error) {
 		err := rows.Scan(&dbName)
 
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 		var (
 			database       string
@@ -188,13 +188,13 @@ func (m MysqlDb) GetDDLSchemas(db *sql.DB) ([]types.DataDDLs, error) {
 
 		rows, err := db.Query("SHOW CREATE SCHEMA " + dbName)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 
 		for rows.Next() {
 			err := rows.Scan(&database, &createDatabase)
 			if err != nil {
-				panic(err)
+				return nil, err
 			}
 			obj.ObjectName = dbName
 			obj.ObjectDDL = createDatabase

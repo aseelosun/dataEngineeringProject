@@ -36,7 +36,6 @@ func (p PostgresDb) GetDDLTables(db *sql.DB) ([]types.DataDDLs, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
 
 	for rows.Next() {
 		var obj types.DataDDLs
@@ -44,21 +43,20 @@ func (p PostgresDb) GetDDLTables(db *sql.DB) ([]types.DataDDLs, error) {
 		var tableDdl string
 		rows, e4 := db.Query(`SELECT generate_create_table_statement($1)`, tableName)
 		if e4 != nil {
-			panic(e4)
+			return nil, e4
 		}
 		for rows.Next() {
 			e5 := rows.Scan(&tableDdl)
 			if e5 != nil {
-				panic(e5)
+				return nil, e5
 			}
 		}
 		obj.ObjectName = tableName
 		obj.ObjectDDL = tableDdl
 		tablesArray = append(tablesArray, obj)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
-		fmt.Println(tablesArray)
 	}
 	return tablesArray, nil
 }

@@ -2,15 +2,28 @@ package main
 
 import (
 	"dataEngineeringProject/chain"
+	cfg "dataEngineeringProject/config"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 )
 
 func main() {
-	err := chain.ExecuteChain()
-	checkError(err)
-
+	//err := chain.ExecuteChain()
+	//if err != nil {
+	//	fmt.Sprintf("Error %s", err)
+	//}
+	conf, e := cfg.LoadConfiguration("C:\\configFile\\config.json")
+	checkError(e)
+	for i := 0; i < len(conf.ConfigsSql); i++ {
+		strArray := []string{"tables", "views", "procedures", "schemas"}
+		for j := 0; j < len(strArray); j++ {
+			err := chain.ExecuteChain(strArray[j], i)
+			if err != nil {
+				_ = fmt.Sprintf("Error %s", err)
+			}
+		}
+	}
 	//db, err := dbConn.GetDbConnect(conf.ConfigsSql[0].Db)
 	//dbb, errr := db.ConnectingToDb(conf.ConfigsSql[0])
 	//

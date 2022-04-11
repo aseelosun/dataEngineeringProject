@@ -126,7 +126,7 @@ func (d *ddlCommit) Action(p *ParameterValues) ([]types.DataDDLs, string, error)
 	return arr, "", nil
 }
 
-func ExecuteChain() error {
+func ExecuteChain(tType string, i int) error {
 	conf, e := cfg.LoadConfiguration(ConfigPath)
 	checkError(e)
 	paths, ee := cfg.LoadPaths(ConfigPath)
@@ -134,59 +134,53 @@ func ExecuteChain() error {
 	gitConf, eee := cfg.LoadGitConfigs(ConfigPath)
 	checkError(eee)
 
-	for i := 0; i < len(conf.ConfigsSql); i++ {
-		d, err := dbConn.GetDbConnect(conf.ConfigsSql[i].Db)
-		checkError(err)
-		db, err1 := d.ConnectingToDb(conf.ConfigsSql[i])
-		checkError(err1)
-		strArray := []string{"tables", "views", "procedures", "schemas"}
-		for j := 0; j < len(strArray); j++ {
-			prm := ParameterValues{
-				d:           d,
-				dbConn:      db,
-				cPath:       paths.Paths.CatalogsPath,
-				dbname:      conf.ConfigsSql[i].Dbname,
-				tType:       strArray[j],
-				gitUsername: gitConf.Github.Username,
-				gitPassword: gitConf.Github.Password,
-				gitRepo:     gitConf.Github.Repository,
-			}
-
-			chain0 := &ddlGet{}
-
-			arr, _, e1 := chain0.Action(&prm)
-			checkError(e1)
-
-			chain1 := &ddlUpload{
-				tableDdls: arr,
-				caller:    chain0,
-			}
-			_, _, e2 := chain1.Action(&prm)
-			checkError(e2)
-
-			chain2 := &ddlRemove{
-				tableDdls: arr,
-				caller:    chain1,
-			}
-			_, remFile, e3 := chain2.Action(&prm)
-			checkError(e3)
-
-			finalChain := &ddlCommit{removedFile: remFile, caller: chain2}
-
-			_, _, e4 := finalChain.Action(&prm)
-			checkError(e4)
-
-			fmt.Println("Success!")
-
-			return nil
-		}
+	d, err := dbConn.GetDbConnect(conf.ConfigsSql[i].Db)
+	checkError(err)
+	db, err1 := d.ConnectingToDb(conf.ConfigsSql[i])
+	checkError(err1)
+	prm := ParameterValues{
+		d:           d,
+		dbConn:      db,
+		cPath:       paths.Paths.CatalogsPath,
+		dbname:      conf.ConfigsSql[i].Dbname,
+		tType:       tType,
+		gitUsername: gitConf.Github.Username,
+		gitPassword: gitConf.Github.Password,
+		gitRepo:     gitConf.Github.Repository,
 	}
+
+	chain0 := &ddlGet{}
+
+	arr, _, e1 := chain0.Action(&prm)
+	checkError(e1)
+
+	chain1 := &ddlUpload{
+		tableDdls: arr,
+		caller:    chain0,
+	}
+	_, _, e2 := chain1.Action(&prm)
+	checkError(e2)
+
+	chain2 := &ddlRemove{
+		tableDdls: arr,
+		caller:    chain1,
+	}
+	_, remFile, e3 := chain2.Action(&prm)
+	checkError(e3)
+
+	finalChain := &ddlCommit{removedFile: remFile, caller: chain2}
+
+	_, _, e4 := finalChain.Action(&prm)
+	checkError(e4)
+
+	fmt.Println("Success!")
+
 	return nil
+
 }
 
 func checkError(err error) {
 	if err != nil {
 		fmt.Sprintf("Error %s", err)
-		panic(err)
 	}
 }

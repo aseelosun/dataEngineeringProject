@@ -1,0 +1,2 @@
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `students_view` AS select `mysql`.`students`.`s_id` AS `s_id`,`mysql`.`students`.`s_name` AS `s_name`,`mysql`.`students`.`s_surname` AS `s_surname`,`mysql`.`students`.`s_email` AS `s_email` from `students`
